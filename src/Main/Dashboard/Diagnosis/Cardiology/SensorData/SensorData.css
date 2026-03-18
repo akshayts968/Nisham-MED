@@ -1,0 +1,100 @@
+/* Live Sensor Display Area */
+.sensor-display {
+  width: 100%;
+  height: 80px;
+  background-color: #f3f4f6;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+/* Heartbeat Animation for the Recording State */
+.heartbeat-loader {
+  color: #ef4444;
+  font-weight: 700;
+  font-size: 18px;
+  animation: heartbeat 1.2s infinite;
+}
+
+@keyframes heartbeat {
+  0% { transform: scale(1); }
+  15% { transform: scale(1.1); }
+  30% { transform: scale(1); }
+  45% { transform: scale(1.1); }
+  60% { transform: scale(1); }
+  100% { transform: scale(1); }
+}
+
+/* --- Active ECG Animation --- */
+.ecg-animation-container {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+  background-color: #111827; /* Dark monitor background */
+  border-radius: 12px;
+}
+
+.ecg-svg {
+  width: 200%; /* Double width for the scrolling loop */
+  height: 80px;
+  animation: slideEcg 1.5s linear infinite;
+}
+
+.ecg-line {
+  fill: none;
+  stroke: #10b981; /* Classic medical monitor green */
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  /* Adds a slight glow to the line */
+  filter: drop-shadow(0px 0px 4px rgba(16, 185, 129, 0.6)); 
+}
+
+/* Creates a smooth fade on the right edge so the line disappears nicely */
+.fade-overlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 30%;
+  height: 100%;
+  background: linear-gradient(to right, transparent, #111827);
+}
+
+@keyframes slideEcg {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%); /* Slides exactly half the SVG to loop seamlessly */
+  }
+}
+
+
+
+.ecg-plot-container {
+  margin-top: 15px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  border-top: 1px solid #eee;
+  padding-top: 15px;
+}
+
+.ecg-result-img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.diagnosis-text {
+  color: #14a098;
+  font-weight: 600;
+  font-size: 18px;
+  margin-bottom: 5px;
+}

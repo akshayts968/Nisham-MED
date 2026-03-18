@@ -1,0 +1,69 @@
+/* Auth.css */
+.auth-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.auth-form-container {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.auth-input {
+  width: 100%;
+  padding: 16px;
+  background-color: #f3f4f6; /* Light gray from mockup */
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.auth-input:focus {
+  border-color: #14a098; /* Teal highlight */
+  background-color: #ffffff;
+}
+
+.auth-button {
+  width: 100%;
+  background-color: #000000;
+  color: #ffffff;
+  padding: 16px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 500;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background-color 0.2s;
+}
+
+.auth-button:hover {
+  background-color: #333333;
+}
+
+.auth-footer-text {
+  text-align: center;
+  font-size: 14px;
+  color: #6b7280;
+  margin-top: 8px;
+}
+
+.auth-link {
+  color: #14a098; /* Teal text */
+  cursor: pointer;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.auth-link:hover {
+  text-decoration: underline;
+}

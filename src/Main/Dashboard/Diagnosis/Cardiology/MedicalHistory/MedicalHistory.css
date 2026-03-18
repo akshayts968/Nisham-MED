@@ -1,0 +1,322 @@
+/* MedicalHistory.css */
+
+.medical-history-wrapper {
+  height: 100vh;
+  background-color: #f4f7f6;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Reusable Header (consistent with Cardiology/Diagnosis) */
+.top-nav-bar {
+  background-color: #14a098;
+  color: white;
+  padding: 20px 24px; 
+  display: flex;
+  align-items: center;
+  box-shadow: 0 4px 12px rgba(20, 160, 152, 0.2); 
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+.back-arrow {
+  background: none;
+  border: none;
+  color: white;
+  margin-right: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px; 
+  margin-left: -8px;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.back-arrow:active {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.nav-title {
+  font-size: 22px; 
+  font-weight: 700; 
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+/* Content Area for Form */
+.medical-history-content {
+  flex: 1;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px; /* Standard gap between cards */
+  overflow-y: auto; /* Allows scrolling if the form is tall */
+  padding-bottom: 80px; /* Space for the bottom button */
+}
+
+/* Form Section Card */
+.form-card {
+  background-color: #ffffff;
+  border-radius: 20px; 
+  padding: 32px 32px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  border: 1px solid #f3f4f6;
+}
+
+/* Row within a card */
+.form-row {
+  margin-bottom: 24px;
+}
+
+.form-row:last-child {
+  margin-bottom: 0;
+}
+
+/* Question Title */
+.form-label {
+  font-weight: 700;
+  color: #111827;
+  font-size: 16px;
+  margin-bottom: 12px;
+  display: inline-block;
+}
+
+/* For AGE style - label inline with underlined input */
+.label-inline {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.underlined-input {
+  border: none;
+  border-bottom: 2px solid #333; /* Thick black line from mockup */
+  outline: none;
+  font-size: 16px;
+  padding: 4px;
+  width: 120px;
+  font-weight: 700;
+  text-align: center;
+  background: transparent;
+}
+
+.underlined-input:focus {
+  border-bottom-color: #14a098;
+}
+
+/* Custom Radio Button Group */
+.radio-group {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+  cursor: pointer;
+  margin: 0;
+}
+
+.radio-label input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #14a098; /* Custom teal color for the radio bullet */
+  margin: 0;
+  cursor: pointer;
+}
+
+/* Question Title above a group of answers */
+.section-title {
+  font-weight: 700;
+  color: #111827;
+  font-size: 18px;
+  margin-bottom: 20px;
+}
+
+/* Answer Grid for section (e.g., Past heart problems) */
+.radio-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Two columns */
+  gap: 16px 24px;
+}
+
+/* Submit Button at Bottom (matches Cardiology page) */
+.save-btn-container {
+  margin-top: auto; 
+  padding-top: 40px;
+  padding-bottom: 20px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  position: relative;
+  z-index: 5;
+}
+
+.save-btn {
+  background-color: #14a098;
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 700;
+  padding: 16px 64px;
+  border-radius: 30px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(20, 160, 152, 0.3);
+  transition: all 0.2s ease;
+}
+
+.save-btn:hover {
+  background-color: #0f827a;
+  transform: translateY(-2px);
+}
+
+/* Mobile Adjustments */
+@media (max-width: 600px) {
+  .medical-history-content {
+    padding: 24px 20px;
+    gap: 20px;
+    padding-bottom: 80px;
+  }
+  
+  .form-card {
+    padding: 24px;
+  }
+  
+  .radio-grid {
+    grid-template-columns: 1fr; /* Single column on tiny screens */
+    gap: 12px;
+  }
+}
+
+/* --- UPDATE THESE SECTIONS IN MedicalHistory.css --- */
+
+/* Content Area for Form - Made wider */
+.medical-history-content {
+  flex: 1;
+  width: 100%;
+  max-width: 900px; /* Increased from 800px to allow bigger cards */
+  margin: 0 auto;
+  padding: 40px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px; /* Increased gap between the two cards */
+  overflow-y: auto; 
+  padding-bottom: 80px; 
+}
+
+/* Form Section Card - More padding */
+.form-card {
+  background-color: #ffffff;
+  border-radius: 20px; 
+  padding: 40px; /* Increased from 32px for a roomier feel */
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05); /* Slightly softer, larger shadow */
+  border: 1px solid #f3f4f6;
+}
+
+/* Question Title - Larger text */
+.form-label {
+  font-weight: 700;
+  color: #111827;
+  font-size: 18px; /* Increased from 16px */
+  margin-bottom: 16px;
+  display: inline-block;
+}
+
+/* Underlined Input - Larger text and slightly wider */
+.underlined-input {
+  border: none;
+  border-bottom: 2px solid #333; 
+  outline: none;
+  font-size: 18px; /* Increased from 16px */
+  padding: 4px;
+  width: 140px; /* Increased from 120px */
+  font-weight: 700;
+  text-align: center;
+  background: transparent;
+}
+
+/* Custom Radio Button Group - Bigger text and buttons */
+.radio-group {
+  display: flex;
+  gap: 32px; /* Spread options further apart */
+  flex-wrap: wrap;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* More space between the button and the text */
+  font-size: 17px; /* Increased from 15px */
+  font-weight: 600;
+  color: #333;
+  cursor: pointer;
+  margin: 0;
+}
+
+/* Make the actual clickable circle larger */
+.radio-label input[type="radio"] {
+  width: 22px; /* Increased from 18px */
+  height: 22px; /* Increased from 18px */
+  accent-color: #14a098; 
+  margin: 0;
+  cursor: pointer;
+}
+
+/* Question Title above a group of answers - Larger text */
+.section-title {
+  font-weight: 800;
+  color: #111827;
+  font-size: 22px; /* Increased from 18px */
+  margin-bottom: 24px;
+}
+
+/* Answer Grid - More spacing */
+.radio-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); 
+  gap: 20px 32px; /* Increased gap between grid items */
+}
+
+/* Mobile Adjustments */
+@media (max-width: 600px) {
+  .medical-history-content {
+    padding: 24px 20px;
+    gap: 24px;
+    padding-bottom: 80px;
+  }
+  
+  .form-card {
+    padding: 32px 24px; /* Slightly scaled back for mobile, but still bigger than before */
+  }
+  
+  .radio-grid {
+    grid-template-columns: 1fr; 
+    gap: 16px;
+  }
+}
+
+/* --- Remove the up/down arrows from the number input --- */
+
+/* For Chrome, Safari, Edge, and Opera */
+.underlined-input::-webkit-outer-spin-button,
+.underlined-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* For Firefox */
+.underlined-input[type=number] {
+  -moz-appearance: textfield;
+}
