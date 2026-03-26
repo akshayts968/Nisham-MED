@@ -84,10 +84,10 @@
   width: 16px;
   height: 16px;
   cursor: pointer;
-  accent-color: #14a098; /* Makes the dot teal when selected */
+  accent-color: #14a098; 
 }
 
-/* Grid for Substance Use (Aligns columns nicely) */
+/* Grid for Substance Use */
 .substance-grid {
   display: grid;
   grid-template-columns: 180px 1fr;
@@ -125,4 +125,39 @@
 .save-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 12px rgba(20, 160, 152, 0.4);
+}
+
+/* --- NEW: Dropdown & Subtitle Styles --- */
+.subtitle-text {
+  color: #666;
+  font-size: 14px;
+  margin-top: -15px; /* Pulls it closer to the h2 title */
+  margin-bottom: 16px;
+}
+
+.dropdown-select {
+  width: 100%;
+  max-width: 400px;
+  padding: 12px 16px;
+  font-size: 16px;
+  color: #333;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  appearance: none; /* Removes the ugly default browser arrow */
+  
+  /* Adds a custom teal SVG arrow to match your theme */
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2314a098' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+  transition: all 0.2s ease;
+}
+
+.dropdown-select:focus {
+  outline: none;
+  border-color: #14a098;
+  box-shadow: 0 0 0 3px rgba(20, 160, 152, 0.15);
+  background-color: #fff;
 }

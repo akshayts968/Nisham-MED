@@ -44,7 +44,7 @@ const SensorData = () => {
 
     try {
       // Send to Flask WFDB route
-      const response = await fetch('http://localhost:5000/api/analyze-wfdb', {
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/analyze-wfdb`, {
         method: 'POST',
         body: formData, 
       });
@@ -121,7 +121,7 @@ const SensorData = () => {
 
       // 2. Send live data to Flask Backend for ML Prediction
       try {
-        const response = await fetch('http://localhost:5000/api/analyze-live-ecg', {
+        const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/analyze-live-ecg`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userId: 1, ecgData: ecgDataArray }),

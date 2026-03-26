@@ -8,7 +8,7 @@ import MedicalHistory from './Main/Dashboard/Diagnosis/Cardiology/MedicalHistory
 import ClinicalData from './Main/Dashboard/Diagnosis/Cardiology/ClinicalData/ClinicalData';
 import SensorData from './Main/Dashboard/Diagnosis/Cardiology/SensorData/SensorData';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import LifestyleData from './Main/Dashboard/Diagnosis/Cardiology/Lifestyle/LifestyleData';
+import Symptom from './Main/Dashboard/Diagnosis/Cardiology/Symptom/Sympton';
 import ProtectedRoute from './ProtectedRoute'; 
 
 export default function App() {
@@ -46,7 +46,7 @@ export default function App() {
           />
           <Route 
             path="/dashboard/diagnosis/cardiology/lifestyle-data" 
-            element={<ProtectedRoute><LifestyleData /></ProtectedRoute>} 
+            element={<ProtectedRoute><Symptom /></ProtectedRoute>} 
           />
         </Routes>
       </div>

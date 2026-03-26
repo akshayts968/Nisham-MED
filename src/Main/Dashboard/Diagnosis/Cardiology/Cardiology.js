@@ -35,7 +35,7 @@ const Cardiology = () => {
           className="cardiology-menu-card"
           onClick={() => navigate('/dashboard/diagnosis/cardiology/lifestyle-data')}
         >
-          <h2 className="cardiology-menu-title">Lifestyle & Behavioral Data</h2>
+          <h2 className="cardiology-menu-title">Symptoms</h2>
         </div>
 
         <div 

@@ -18,7 +18,7 @@ const MedicalHistory = () => {
     const fetchExistingData = async () => {
       try {
         const userId = 1; // Hardcoded for now, replace with actual user ID later
-        const response = await fetch(`http://localhost:5000/api/medical-history/${userId}`);
+        const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/medical-history/${userId}`);
         
         if (response.ok) {
           const data = await response.json();
@@ -59,7 +59,7 @@ const MedicalHistory = () => {
   // 4. API Call to save or update the data
   const handleSaveAndExit = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/medical-history', {
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/medical-history`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

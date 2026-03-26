@@ -158,4 +158,90 @@
     padding: 14px 60px;
     width: 100%; /* Make button fill the card on mobile */
   }
+} 
+
+
+/* --- Add these to your existing ClinicalData.css --- */
+
+.form-card {
+  background-color: white;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin-bottom: 20px;
+}
+
+.section-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #000;
+  margin-top: 0;
+  margin-bottom: 24px;
+}
+
+.input-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Two columns */
+  gap: 20px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.input-group.full-width {
+  grid-column: 1 / -1; /* Spans across both columns */
+}
+
+.input-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.text-input {
+  padding: 12px 16px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  transition: all 0.2s ease;
+}
+
+.text-input:focus {
+  outline: none;
+  border-color: #14a098;
+  box-shadow: 0 0 0 3px rgba(20, 160, 152, 0.15);
+  background-color: #fff;
+}
+
+.radio-row {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  color: #000;
+  cursor: pointer;
+}
+
+.radio-label input[type="radio"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #14a098;
+}
+
+.success-text {
+  margin-top: 16px;
+  color: #14a098;
+  font-weight: 600;
 }
