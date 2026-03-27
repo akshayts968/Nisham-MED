@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState,useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './ClinicalData.css';
 
@@ -17,7 +17,39 @@ const ClinicalData = () => {
     fastingBS: '',
     maxHR: ''
   });
+// NEW: Fetch existing clinical data on load
+  useEffect(() => {
+    const fetchExistingData = async () => {
+      try {
+        const userId = localStorage.getItem('userId');
+        if (!userId) return;
 
+        // Note the new route name: health-report
+        const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/health-report/${userId}`);
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data) {
+            // Update the form with the database values
+            setFormData({
+              restingBP: data.resting_bp || '',
+              cholesterol: data.cholesterol || '',
+              fastingBS: data.fasting_bs || '',
+              maxHR: data.max_hr || ''
+            });
+            
+            // If they previously uploaded a file, show a message
+            if (data.file_path) {
+              setSelectedFile("Previous report uploaded");
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching clinical data:", error);
+      }
+    };
+    fetchExistingData();
+  }, []);
   // Handle file uploads
   const handleUploadClick = () => {
     fileInputRef.current.click();
@@ -46,10 +78,15 @@ const ClinicalData = () => {
       navigate('/dashboard');
       return;
     }
+    const userId = localStorage.getItem('userId'); 
 
+    if (!userId) {
+        console.error("No user ID found! Please log in again.");
+        return; // Exit early if no user
+    } 
     // We use FormData so we can send both the file AND the text inputs together
     const submitData = new FormData();
-    submitData.append('userId', 1);
+    submitData.append('userId', userId);
     submitData.append('reportType', 'blood_report');
     
     // Append the file if it exists

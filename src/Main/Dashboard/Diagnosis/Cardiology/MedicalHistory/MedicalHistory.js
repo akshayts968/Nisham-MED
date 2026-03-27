@@ -17,7 +17,12 @@ const MedicalHistory = () => {
   useEffect(() => {
     const fetchExistingData = async () => {
       try {
-        const userId = 1; // Hardcoded for now, replace with actual user ID later
+        const userId = localStorage.getItem('userId'); 
+
+        // Always check if the user is actually logged in
+        if (!userId) {
+            console.error("No user ID found! Please log in again.");
+        } // Hardcoded for now, replace with actual user ID later
         const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/medical-history/${userId}`);
         
         if (response.ok) {
@@ -59,13 +64,19 @@ const MedicalHistory = () => {
   // 4. API Call to save or update the data
   const handleSaveAndExit = async () => {
     try {
+      const userId = localStorage.getItem('userId'); 
+
+// Always check if the user is actually logged in
+        if (!userId) {
+            console.error("No user ID found! Please log in again.");
+        }
       const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/medical-history`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          userId: 1, 
+          userId: userId, 
           age: formData.age,
           sex: formData.sex,
           familyHistory: formData.familyHistory,

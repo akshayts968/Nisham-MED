@@ -5,18 +5,23 @@ import './Symptom.css';
 const Symptom = () => {
   const navigate = useNavigate();
 
-  // 1. Added chestDiscomfort to the state
   const [formData, setFormData] = useState({
     physicalActivity: '',
-    chestDiscomfort: '' ,
+    chestDiscomfort: '',
     exerciseAngina: ''
   });
 
-  // 2. Fetch existing data on load
+  // Fetch existing data on load
   useEffect(() => {
     const fetchExistingData = async () => {
       try {
-        const userId = 1; // Remember to replace this with your logged-in user's token ID later!
+        const userId = localStorage.getItem('userId'); 
+
+        if (!userId) {
+            console.error("No user ID found! Please log in again.");
+            return; // Exit early if no user
+        } 
+        
         const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/lifestyle-data/${userId}`);
         if (response.ok) {
           const data = await response.json();
@@ -31,7 +36,7 @@ const Symptom = () => {
     fetchExistingData();
   }, []);
 
-  // 3. Handle inputs (Works for both Radio Buttons AND Select Dropdowns!)
+  // Handle inputs 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -40,13 +45,16 @@ const Symptom = () => {
     });
   };
 
-  // 4. Save to database and return to dashboard
+  // Save to database and return to dashboard
   const handleSaveAndExit = async () => {
     try {
+      const userId = localStorage.getItem('userId'); // Get the real ID!
+
       const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/lifestyle-data`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: 1, ...formData }), 
+        // Use the real userId instead of the hardcoded 1
+        body: JSON.stringify({ userId: userId, ...formData }), 
       });
 
       if (!response.ok) {
@@ -79,7 +87,7 @@ const Symptom = () => {
 
       <div className="lifestyle-content">
         
-        {/* NEW: Chest Discomfort Card */}
+        {/* Chest Discomfort Card */}
         <div className="form-card">
           <h2 className="section-title">Chest Discomfort Type</h2>
           <p className="subtitle-text">(Select the option closest to your condition)</p>
@@ -91,12 +99,14 @@ const Symptom = () => {
             className="dropdown-select"
           >
             <option value="" disabled>Select an option ▼</option>
-            <option value="0">Tight chest pain during activity</option>
-            <option value="1">Mild or unusual chest pain</option>
-            <option value="2">Chest pain not related to heart</option>
-            <option value="3">No chest pain</option>
+            {/* CHANGED: Values are now strings instead of numbers */}
+            <option value="Tight chest pain during activity">Tight chest pain during activity</option>
+            <option value="Mild or unusual chest pain">Mild or unusual chest pain</option>
+            <option value="Chest pain not related to heart">Chest pain not related to heart</option>
+            <option value="No chest pain">No chest pain</option>
           </select>
         </div>
+
         {/* Exercise Induced Angina Card */}
         <div className="form-card">
           <h2 className="section-title">Chest Pain During Physical Activity</h2>
@@ -107,8 +117,8 @@ const Symptom = () => {
               <input 
                 type="radio" 
                 name="exerciseAngina" 
-                value="1" 
-                checked={formData.exerciseAngina === '1'} 
+                value="Yes" 
+                checked={formData.exerciseAngina === 'Yes'} 
                 onChange={handleChange} 
               /> Yes
             </label>
@@ -116,13 +126,14 @@ const Symptom = () => {
               <input 
                 type="radio" 
                 name="exerciseAngina" 
-                value="0" 
-                checked={formData.exerciseAngina === '0'} 
+                value="No" 
+                checked={formData.exerciseAngina === 'No'} 
                 onChange={handleChange} 
               /> No
             </label>
           </div>
         </div>
+
         {/* Physical Activity Card */}
         <div className="form-card">
           <h2 className="section-title">Physical activity</h2>
@@ -144,9 +155,6 @@ const Symptom = () => {
             </label>
           </div>
         </div>
-
-        {/* Substance Use Card */}
-       
 
         {/* Save Button */}
         <div className="save-btn-container">
