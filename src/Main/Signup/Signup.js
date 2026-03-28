@@ -25,11 +25,24 @@ const Signup = () => {
 
   // 3. Handle the actual signup request
   const handleSignup = async () => {
-    // Basic validation: Check if passwords match
-    if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match!");
-      return;
-    }
+  // 1. Password Match Validation
+  if (formData.password !== formData.confirmPassword) {
+    alert("Passwords do not match!");
+    return;
+  }
+
+  // 2. Mobile Number Validation (Check if it's numeric and e.g., 10 digits)
+  const mobileRegex = /^[0-9]+$/; 
+  if (!mobileRegex.test(formData.mobile)) {
+    alert("Please enter a valid mobile number (digits only).");
+    return;
+  }
+
+  // Optional: Check for specific length (e.g., 10 digits)
+  if (formData.mobile.length !== 10) {
+    alert("Mobile number must be exactly 10 digits.");
+    return;
+  }
 
     try {
       // Send the POST request to your Node.js backend

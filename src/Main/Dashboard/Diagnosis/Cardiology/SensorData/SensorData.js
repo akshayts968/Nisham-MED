@@ -1,28 +1,90 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { io } from 'socket.io-client'; // <-- Make sure this is imported!
 import '../ClinicalData/ClinicalData.css';
 import './SensorData.css';
-import ProgressRing from './Progress';
 
 const SensorData = () => {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
   
-
-  
+  // File Upload State
   const [selectedFile, setSelectedFile] = useState(null);
   const [fileObject, setFileObject] = useState(null);
-  const [isRecording, setIsRecording] = useState(false);
-  const [sensorData, setSensorData] = useState(null);
-  const [progress, setProgress] = useState(0);
+  const [fileResult, setFileResult] = useState(null); // For WFDB results
 
+  // Live Wireless Sensor State
+  const [isConnected, setIsConnected] = useState(false);
+  const [livePrediction, setLivePrediction] = useState(null);
+  
+  const canvasRef = useRef(null);
+  const xPosRef = useRef(0);
+  const socketRef = useRef(null);
+
+  // ==========================================
+  // --- REAL-TIME WEBSOCKET LISTENER ---
+  // ==========================================
+  useEffect(() => {
+    // 1. Connect to Flask WebSockets
+    socketRef.current = io(process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000');
+
+    socketRef.current.on('connect', () => setIsConnected(true));
+    socketRef.current.on('disconnect', () => setIsConnected(false));
+
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      
+      // Draw grid
+      const drawGrid = () => {
+        ctx.fillStyle = '#0b0c10'; // Dark theme matching your CSS
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = '#1f2833';
+        ctx.lineWidth = 1;
+        for (let i = 0; i < canvas.width; i += 20) { ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke(); }
+        for (let i = 0; i < canvas.height; i += 20) { ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(canvas.width, i); ctx.stroke(); }
+      };
+
+      drawGrid();
+      ctx.strokeStyle = '#ef4444'; // Red ECG Line
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(0, canvas.height / 2);
+
+      // 2. Listen for Live Data from ESP32
+      socketRef.current.on('react_live_ecg', (data) => {
+        const scaledY = canvas.height - (data.voltage / 4095) * canvas.height;
+        xPosRef.current += 2; 
+
+        if (xPosRef.current > canvas.width) {
+          xPosRef.current = 0;
+          drawGrid();
+          ctx.strokeStyle = '#ef4444';
+          ctx.beginPath();
+          ctx.moveTo(xPosRef.current, scaledY);
+        }
+
+        ctx.lineTo(xPosRef.current, scaledY);
+        ctx.stroke();
+      });
+
+      // 3. Listen for the ML AI Prediction
+      socketRef.current.on('prediction_result', (data) => {
+        setLivePrediction(`✓ Live Diagnosis: ${data.diagnosis} (${data.confidence}% match)`);
+      });
+    }
+
+    // Cleanup on unmount
+    return () => socketRef.current.disconnect();
+  }, []);
+
+  // ==========================================
   // --- UPLOAD WFDB (.dat & .hea) LOGIC ---
+  // ==========================================
   const handleUploadClick = () => fileInputRef.current.click();
   
   const handleFileChange = async (event) => {
     const files = Array.from(event.target.files);
-    
-    // Look for both required files
     const datFile = files.find(f => f.name.endsWith('.dat'));
     const heaFile = files.find(f => f.name.endsWith('.hea'));
 
@@ -33,17 +95,17 @@ const SensorData = () => {
 
     const baseName = datFile.name.replace('.dat', '');
     setSelectedFile(`${baseName} (.dat & .hea)`);
-    setFileObject(true); // Just to satisfy the save button logic
-    setSensorData("Analyzing WFDB records on server...");
+    setFileObject(true); 
+    setFileResult("Analyzing WFDB records on server...");
 
-    // Create Form Data to send both files
     const formData = new FormData();
     formData.append('dat', datFile);
     formData.append('hea', heaFile);
-    formData.append('userId', 1);
+    
+    // Grab the actual user ID from localStorage
+    formData.append('userId', localStorage.getItem('userId') || 'guest');
 
     try {
-      // Send to Flask WFDB route
       const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/analyze-wfdb`, {
         method: 'POST',
         body: formData, 
@@ -53,108 +115,18 @@ const SensorData = () => {
       
       if (response.ok) {
           const confidencePct = (mlResult.confidence * 100).toFixed(1);
-          setSensorData(`✓ File Diagnosis: ${mlResult.diagnosis} (${confidencePct}% match)`);
+          setFileResult(`✓ File Diagnosis: ${mlResult.diagnosis} (${confidencePct}% match)`);
       } else {
-          setSensorData(`Analysis failed: ${mlResult.error}`);
+          setFileResult(`Analysis failed: ${mlResult.error}`);
       }
     } catch (postError) {
       console.error("Backend Error:", postError);
-      setSensorData("Server connection error. Is Flask running?");
-    }
-  };
-
-  // --- REAL AD8232 Live Sensor Logic & ML Prediction ---
-  const startSensor = async () => {
-    if (!('serial' in navigator)) {
-      alert("Your browser does not support Web Serial. Please use Google Chrome or Microsoft Edge.");
-      return;
-    }
-
-    let progressInterval;
-
-    try {
-      // 1. Connect to Arduino
-      const port = await navigator.serial.requestPort();
-      await port.open({ baudRate: 9600 });
-      setIsRecording(true);
-      setSensorData(null);
-      setProgress(0);
-
-      const textDecoder = new TextDecoderStream();
-      const readableStreamClosed = port.readable.pipeTo(textDecoder.writable);
-      const reader = textDecoder.readable.getReader();
-
-      let ecgDataArray = [];
-      const startTime = Date.now();
-      const duration = 10000;
-
-      // Update progress bar
-      progressInterval = setInterval(() => {
-        const elapsed = Date.now() - startTime;
-        const currentPct = Math.min(Math.floor((elapsed / duration) * 100), 100);
-        setProgress(currentPct);
-      }, 100);
-
-      // Stop reading after 10 seconds
-      setTimeout(() => {
-        clearInterval(progressInterval);
-        reader.cancel(); 
-      }, 10000);
-
-      // Read loop
-      while (true) {
-        const { value, done } = await reader.read();
-        if (done) {
-          reader.releaseLock();
-          break;
-        }
-        if (value) {
-          const cleanValue = value.trim();
-          if (cleanValue) {
-            ecgDataArray.push(cleanValue);
-          }
-        }
-      }
-
-      setIsRecording(false);
-      setSensorData("Analyzing live data on server...");
-
-      // 2. Send live data to Flask Backend for ML Prediction
-      try {
-        const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/analyze-live-ecg`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId: 1, ecgData: ecgDataArray }),
-        });
-
-        // This block handles the "Predicted Result" logic
-      const mlResult = await response.json();
-
-      if (response.ok) {
-          // 1. Convert decimal to percentage (e.g., 0.98 -> 98.0)
-          const confidencePct = (mlResult.confidence * 100).toFixed(1);
-          
-          // 2. Set the result string that appears in the UI
-          setSensorData(`✓ Live Diagnosis: ${mlResult.diagnosis} (${confidencePct}% match)`);
-      } else {
-          // Error handling if the model fails
-          setSensorData(`Analysis failed: ${mlResult.error}`);
-      }
-      } catch (postError) {
-        console.error("Backend Error:", postError);
-        setSensorData("Server connection error. Is Flask running?");
-      }
-
-    } catch (error) {
-      clearInterval(progressInterval);
-      setIsRecording(false);
-      console.error("Serial Error:", error);
-      alert("Failed to connect to the sensor. Did you select the correct port?");
+      setFileResult("Server connection error. Is Flask running?");
     }
   };
 
   const handleSaveAndExit = async () => {
-    if (!fileObject && !sensorData) {
+    if (!fileObject && !livePrediction) {
       navigate('/dashboard');
       return;
     }
@@ -176,57 +148,56 @@ const SensorData = () => {
 
       <div className="clinical-data-content">
         
+        {/* ======================================= */}
+        {/* SECTION 1: LIVE WIRELESS ECG MONITOR    */}
+        {/* ======================================= */}
         <div className="upload-card" style={{ marginBottom: '24px' }}>
-          <div className="upload-header">
-            <span className="upload-icon">❤️</span> 
-            <h2 className="upload-title">ECG Monitor</h2>
+          <div className="upload-header" style={{ justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <span className="upload-icon">❤️</span> 
+              <h2 className="upload-title">Live Wireless ECG</h2>
+            </div>
+            <span style={{ fontSize: '14px', color: isConnected ? '#10b981' : '#ef4444', fontWeight: 'bold' }}>
+              {isConnected ? '🟢 Server Online' : '🔴 Server Offline'}
+            </span>
           </div>
           
-          <div className="sensor-display">
-            {isRecording ? (
-              <div className="ecg-animation-container">
-                <svg viewBox="0 0 800 100" className="ecg-svg">
-                  <polyline
-                    className="ecg-line"
-                    points="0,50 150,50 170,20 190,80 210,50 250,50 270,10 290,90 310,50 400,50 550,50 570,20 590,80 610,50 650,50 670,10 690,90 710,50 800,50"
-                  />
-                </svg>
-                <div className="fade-overlay"></div>
-                
-                <div className="progress-overlay">
-                  <span className="progress-text">Recording... {progress}%</span>
-                  <div className="progress-bar-track">
-                    <div className="progress-bar-fill" style={{ width: `${progress}%` }}></div>
-                  </div>
-                </div>
-              </div>
-            ) : sensorData ? (
-              <p style={{ color: '#14a098', fontWeight: '600', padding: '0 16px', textAlign: 'center' }}>{sensorData}</p>
-            ) : (
-              <div className="sensor-display">
-              {/* If sensorData has a value (e.g., after the fetch completes) */}
-              <p style={{ color: '#14a098', fontWeight: '600', padding: '0 16px', textAlign: 'center' }}>
-                ✓ Live Diagnosis: Normal Sinus Rhythm (98.4% match)
+          <p style={{ textAlign: 'center', color: '#666', fontSize: '14px', marginBottom: '15px' }}>
+            Ensure device is powered on. Tap patient RFID card on the scanner to begin the live feed.
+          </p>
+
+          <div className="sensor-display" style={{ padding: '0', overflow: 'hidden', background: '#0b0c10' }}>
+            {/* The real-time Canvas replaces the static SVG animation */}
+            <canvas 
+              ref={canvasRef} 
+              width={600} 
+              height={150} 
+              style={{ display: 'block', width: '100%', borderRadius: '8px' }}
+            />
+          </div>
+
+          <div style={{ marginTop: '15px', minHeight: '30px' }}>
+            {livePrediction ? (
+              <p style={{ color: '#14a098', fontWeight: '600', textAlign: 'center', margin: 0, fontSize: '18px' }}>
+                {livePrediction}
               </p>
-            </div>
+            ) : (
+              <p style={{ color: '#9ca3af', textAlign: 'center', margin: 0 }}>
+                Waiting for data stream... (Requires 10s for AI Analysis)
+              </p>
             )}
           </div>
-          <button 
-            className="upload-btn" 
-            onClick={startSensor}
-            disabled={isRecording}
-            style={{ backgroundColor: isRecording ? '#9ca3af' : '#ef4444' }}
-          >
-            {isRecording ? 'Recording...' : 'Start Sensor'}
-          </button>
         </div>
 
+        {/* ======================================= */}
+        {/* SECTION 2: UPLOAD PAST ECG (WFDB)       */}
+        {/* ======================================= */}
         <div className="upload-card">
           <div className="upload-header">
             <span className="upload-icon">🗂️</span> 
             <h2 className="upload-title">Upload Past ECG</h2>
           </div>
-          {/* UPDATED INPUT: Accepts .dat and .hea, and allows multiple selection */}
+          
           <input 
             type="file" 
             ref={fileInputRef} 
@@ -235,10 +206,13 @@ const SensorData = () => {
             accept=".dat,.hea" 
             multiple 
           />
+          
           <button className="upload-btn" onClick={handleUploadClick}>
             {selectedFile ? 'Change Files' : 'Upload WFDB Files'}
           </button>
-          {selectedFile && <p style={{ marginTop: '16px', color: '#14a098', fontWeight: '600' }}>✓ {selectedFile}</p>}
+          
+          {selectedFile && <p style={{ marginTop: '16px', color: '#14a098', fontWeight: '600', textAlign: 'center' }}>✓ {selectedFile}</p>}
+          {fileResult && <p style={{ marginTop: '8px', color: fileResult.includes('failed') ? '#ef4444' : '#14a098', fontWeight: 'bold', textAlign: 'center' }}>{fileResult}</p>}
         </div>
 
         <div className="save-btn-container">

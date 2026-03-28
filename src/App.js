@@ -10,7 +10,8 @@ import SensorData from './Main/Dashboard/Diagnosis/Cardiology/SensorData/SensorD
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Symptom from './Main/Dashboard/Diagnosis/Cardiology/Symptom/Sympton';
 import ProtectedRoute from './ProtectedRoute'; 
-
+import CardLogin from './Main/Login/Card';
+import LiveEcgMonitor from './Main/Dashboard/Diagnosis/Cardiology/SensorData/LiveEcgMonitor';
 export default function App() {
   return (
     <Router>
@@ -48,6 +49,8 @@ export default function App() {
             path="/dashboard/diagnosis/cardiology/lifestyle-data" 
             element={<ProtectedRoute><Symptom /></ProtectedRoute>} 
           />
+          <Route path="/card-login" element={<CardLogin />} />
+          <Route path="/card" element={<LiveEcgMonitor />} />
         </Routes>
       </div>
     </Router>
