@@ -17,7 +17,8 @@ const Dashboard = () => {
   };
 
   const menuItems = [
-    { title: 'Diagnosis', icon: '🖥️', route: '/dashboard/diagnosis' }, // Updated route to match your App.jsx
+    { title: 'Profile', icon: '👤', route: '/dashboard/profile' }, // <-- ADDED PROFILE ROUTE
+    { title: 'Diagnosis', icon: '🖥️', route: '/dashboard/diagnosis' }, 
     { title: 'Book An\nAppointment', icon: '📅', route: 'dashboard' },
     { title: 'Appointment\nList', icon: '📋', route: 'dashboard' },
     { title: 'Find A\nDoctor', icon: '👨‍⚕️', route: 'dashboard' },

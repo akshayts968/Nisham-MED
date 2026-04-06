@@ -12,6 +12,7 @@ import Symptom from './Main/Dashboard/Diagnosis/Cardiology/Symptom/Sympton';
 import ProtectedRoute from './ProtectedRoute'; 
 import CardLogin from './Main/Login/Card';
 import LiveEcgMonitor from './Main/Dashboard/Diagnosis/Cardiology/SensorData/LiveEcgMonitor';
+import Profile from './Main/Dashboard/Profile/Profile';
 export default function App() {
   return (
     <Router>
@@ -24,6 +25,10 @@ export default function App() {
           <Route 
             path="/dashboard" 
             element={<ProtectedRoute><Dashboard /></ProtectedRoute>} 
+          />
+          <Route 
+            path="/dashboard/profile" 
+            element={<ProtectedRoute><Profile /></ProtectedRoute>} 
           />
           <Route 
             path="/dashboard/diagnosis" 

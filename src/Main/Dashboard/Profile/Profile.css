@@ -1,0 +1,470 @@
+/* --- Profile.css --- */
+/* --- Profile.css --- */
+
+/* Main Container */
+.profile-container {
+  min-height: 100vh;
+  background-color: #0f172a; /* Deep slate background */
+  color: #f8fafc;
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* Back Button */
+.back-btn {
+  align-self: flex-start;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto 30px;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s ease, transform 0.2s ease;
+  display: flex;
+  align-items: center;
+  padding: 0;
+}
+
+.back-btn:hover {
+  color: #38bdf8; /* Soft neon blue on hover */
+  transform: translateX(-4px); /* Slight nudge to the left */
+}
+
+/* The Profile Card */
+.profile-card {
+  background-color: #1e293b; /* Slightly lighter slate */
+  border: 1px solid #334155;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 600px;
+  padding: 40px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+}
+
+/* Header Section (Avatar & Name) */
+.profile-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-bottom: 1px solid #334155;
+  padding-bottom: 30px;
+  margin-bottom: 30px;
+}
+
+/* Circular Avatar with Gradient */
+.profile-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0ea5e9, #3b82f6);
+  color: white;
+  font-size: 2.5rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 20px rgba(14, 165, 233, 0.4); /* Glowing blue shadow */
+  letter-spacing: 2px;
+}
+
+.profile-header h2 {
+  margin: 0 0 8px 0;
+  font-size: 1.75rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.profile-role {
+  margin: 0;
+  color: #38bdf8; /* Hospital primary accent color */
+  font-weight: 500;
+  font-size: 1.1rem;
+  letter-spacing: 0.5px;
+}
+
+/* Details Section (The Data Fields) */
+.profile-details {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.detail-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Small uppercase labels */
+.detail-group label {
+  color: #94a3b8;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+/* The Data Boxes */
+.detail-group p {
+  margin: 0;
+  font-size: 1.05rem;
+  color: #f1f5f9;
+  background: #0f172a; /* Inset dark background */
+  padding: 14px 18px;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  transition: border-color 0.2s ease;
+}
+
+.detail-group p:hover {
+  border-color: #475569; /* Highlights slightly when hovering over the data */
+}
+
+/* Monospace font for technical IDs */
+.mono-text {
+  font-family: 'Courier New', Courier, monospace;
+  color: #a78bfa !important; /* Soft purple to stand out as an ID */
+  letter-spacing: 1px;
+}
+
+/* Loading & Error Screen States */
+.profile-loading, .profile-error {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  background-color: #0f172a;
+  color: #f8fafc;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.profile-error {
+  color: #ef4444; /* Alert Red */
+  font-weight: 600;
+}
+
+/* Main Container */
+.profile-container {
+  min-height: 100vh;
+  background-color: #0f172a; /* Deep slate background */
+  color: #f8fafc;
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* Back Button */
+.back-btn {
+  align-self: flex-start;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto 30px;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s ease, transform 0.2s ease;
+  display: flex;
+  align-items: center;
+  padding: 0;
+}
+
+.back-btn:hover {
+  color: #38bdf8; /* Soft neon blue on hover */
+  transform: translateX(-4px); /* Slight nudge to the left */
+}
+
+/* The Profile Card */
+.profile-card {
+  background-color: #1e293b; /* Slightly lighter slate */
+  border: 1px solid #334155;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 600px;
+  padding: 40px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+}
+
+/* Header Section (Avatar & Name) */
+.profile-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-bottom: 1px solid #334155;
+  padding-bottom: 30px;
+  margin-bottom: 30px;
+}
+
+/* Circular Avatar with Gradient */
+.profile-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0ea5e9, #3b82f6);
+  color: white;
+  font-size: 2.5rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 20px rgba(14, 165, 233, 0.4); /* Glowing blue shadow */
+  letter-spacing: 2px;
+}
+
+.profile-header h2 {
+  margin: 0 0 8px 0;
+  font-size: 1.75rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.profile-role {
+  margin: 0;
+  color: #38bdf8; /* Hospital primary accent color */
+  font-weight: 500;
+  font-size: 1.1rem;
+  letter-spacing: 0.5px;
+}
+
+/* Details Section (The Data Fields) */
+.profile-details {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.detail-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Small uppercase labels */
+.detail-group label {
+  color: #94a3b8;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+/* The Data Boxes */
+.detail-group p {
+  margin: 0;
+  font-size: 1.05rem;
+  color: #f1f5f9;
+  background: #0f172a; /* Inset dark background */
+  padding: 14px 18px;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  transition: border-color 0.2s ease;
+}
+
+.detail-group p:hover {
+  border-color: #475569; /* Highlights slightly when hovering over the data */
+}
+
+/* Monospace font for technical IDs */
+.mono-text {
+  font-family: 'Courier New', Courier, monospace;
+  color: #a78bfa !important; /* Soft purple to stand out as an ID */
+  letter-spacing: 1px;
+}
+
+/* Loading & Error Screen States */
+.profile-loading, .profile-error {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  background-color: #0f172a;
+  color: #f8fafc;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.profile-error {
+  color: #ef4444; /* Alert Red */
+  font-weight: 600;
+}
+
+
+/* --- ECG History Section --- */
+.ecg-history-section {
+  margin-top: 40px;
+  border-top: 1px solid #334155;
+  padding-top: 30px;
+  width: 100%;
+}
+
+.history-title {
+  color: #f8fafc;
+  font-size: 1.25rem;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.no-records {
+  color: #94a3b8;
+  font-style: italic;
+  text-align: center;
+  padding: 20px;
+}
+
+/* The Container for the List */
+.ecg-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px; 
+}
+
+/* Individual Expandable Cards */
+.ecg-list-item {
+  display: flex;
+  flex-direction: column;
+  background-color: #0f172a; 
+  border-radius: 12px;
+  border: 1px solid #334155;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  overflow: hidden; /* Keeps the graph tucked inside */
+}
+
+/* Hover Effect (Only when NOT expanded) */
+.ecg-list-item:not(.expanded):hover {
+  border-color: #38bdf8; 
+  background-color: #16213b;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.5);
+}
+
+/* Expanded State Styling */
+.ecg-list-item.expanded {
+  border-color: #475569;
+  background-color: #0b1120; /* Very dark background for the graph */
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* The Clickable Header Row */
+.ecg-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 24px;
+}
+
+/* Left Column (Time) */
+.ecg-list-time {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 120px;
+}
+
+.ecg-date {
+  color: #f1f5f9;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.ecg-time {
+  color: #94a3b8;
+  font-size: 0.85rem;
+}
+
+/* Middle Column (Results) */
+.ecg-list-result {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  flex: 1;
+  padding-left: 20px;
+}
+
+/* Dynamic Diagnosis Badges */
+.ecg-diag {
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 4px 10px;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+}
+
+.diag-good {
+  background-color: rgba(16, 185, 129, 0.15); 
+  color: #34d399; 
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.diag-danger {
+  background-color: rgba(239, 68, 68, 0.15); 
+  color: #f87171; 
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.diag-warning {
+  background-color: rgba(245, 158, 11, 0.15); 
+  color: #fbbf24; 
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.diag-offline {
+  background-color: rgba(100, 116, 139, 0.15); 
+  color: #94a3b8;
+  border: 1px solid rgba(100, 116, 139, 0.3);
+}
+
+.ecg-conf {
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+.ecg-conf strong {
+  color: #cbd5e1;
+}
+
+/* Right Column (Arrow) */
+.ecg-arrow {
+  color: #475569;
+  font-size: 1.2rem;
+  transition: color 0.2s ease;
+}
+
+.ecg-list-item:not(.expanded):hover .ecg-arrow {
+  color: #38bdf8;
+}
+
+/* --- The Graph Container --- */
+.ecg-expanded-content {
+  padding: 0 24px 24px 24px;
+  cursor: default; /* Prevents clicking the graph from closing the card */
+  animation: slideDown 0.3s ease-out forwards;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.chart-wrapper {
+  background: #0f172a;
+  padding: 20px 10px 10px 0;
+  border-radius: 8px;
+  border: 1px solid #1e293b;
+}
