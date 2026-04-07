@@ -11,34 +11,26 @@ const SensorData = () => {
   // File Upload State
   const [selectedFile, setSelectedFile] = useState(null);
   const [fileObject, setFileObject] = useState(null);
-  const [fileResult, setFileResult] = useState(null);
 
   // Live Wireless Sensor State
   const [isConnected, setIsConnected] = useState(false);
-  const [livePrediction, setLivePrediction] = useState(null);
   
   const canvasRef = useRef(null);
   const xPosRef = useRef(0);
   const socketRef = useRef(null);
 
   // ==========================================
-  // --- COMBINED PREDICTION STATE & REFS ---
+  // --- UNIFIED PREDICTION STATE ---
   // ==========================================
-  const [bloodData, setBloodData] = useState({
-    Troponin_I_ng_mL: '',
-    CK_MB_ng_mL: '',
-    BNP_pg_mL: '',
-    Potassium_mEq_L: '',
-    Creatinine_mg_dL: ''
-  });
+  const ecgResultRef = useRef(null); 
   
-  const bloodDataRef = useRef(bloodData);
-  const ecgResultRef = useRef(null); // <-- NEW: Saves the ECG result to average later
+  // New unified state to display ECG results beautifully in the final card
+  const [ecgReport, setEcgReport] = useState(null); 
   
   const [bloodPrediction, setBloodPrediction] = useState(null);
+  const [fetchedBloodData, setFetchedBloodData] = useState(null); 
   const [isPredictingBlood, setIsPredictingBlood] = useState(false);
-  
-  const [finalPrediction, setFinalPrediction] = useState(null); // <-- NEW: The averaged result
+  const [finalPrediction, setFinalPrediction] = useState(null);
 
   // ==========================================
   // --- REAL-TIME WEBSOCKET LISTENER ---
@@ -86,32 +78,32 @@ const SensorData = () => {
 
       // --- TRIGGER 1: AUTOMATIC BLOOD ANALYSIS AFTER LIVE ECG ---
       socketRef.current.on('prediction_result', async (data) => {
-        // Save the ECG result to our secret Ref for averaging later
         ecgResultRef.current = { diagnosis: data.diagnosis, confidence: data.confidence };
         
-        setLivePrediction(`✓ Live Diagnosis: ${data.diagnosis} (${data.confidence}% match). Auto-saved.`);
+        // Save ECG report to display in the bottom card
+        setEcgReport({
+          source: 'Live Wireless Stream',
+          diagnosis: data.diagnosis,
+          confidence: data.confidence
+        });
         
         setIsPredictingBlood(true);
-        setBloodPrediction("Live ECG complete. Analyzing blood biomarkers...");
+        setBloodPrediction(null); 
+        setFetchedBloodData(null);
+        setFinalPrediction(null);
 
         try {
           const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/analyze-blood`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              userId: localStorage.getItem('userId') || 'guest',
-              Troponin_I_ng_mL: parseFloat(bloodDataRef.current.Troponin_I_ng_mL) || 0,
-              CK_MB_ng_mL: parseFloat(bloodDataRef.current.CK_MB_ng_mL) || 0,
-              BNP_pg_mL: parseFloat(bloodDataRef.current.BNP_pg_mL) || 0,
-              Potassium_mEq_L: parseFloat(bloodDataRef.current.Potassium_mEq_L) || 0,
-              Creatinine_mg_dL: parseFloat(bloodDataRef.current.Creatinine_mg_dL) || 0
-            })
+            body: JSON.stringify({ userId: localStorage.getItem('userId') || 'guest' })
           });
 
           const result = await response.json();
 
           if (response.ok) {
-            setBloodPrediction(`✓ Blood Diagnosis: ${result.diagnosis} (${result.confidence}% match). Auto-saved!`);
+            setFetchedBloodData(result.biomarkers); 
+            setBloodPrediction(`Diagnosis: ${result.diagnosis} (${result.confidence}% match)`);
             calculateEnsemblePrediction(result.diagnosis, result.confidence);
           } else {
             setBloodPrediction(`❌ Error: ${result.error}`);
@@ -145,7 +137,12 @@ const SensorData = () => {
     const baseName = datFile.name.replace('.dat', '');
     setSelectedFile(`${baseName} (.dat & .hea)`);
     setFileObject(true); 
-    setFileResult("Analyzing WFDB records on server...");
+    
+    // Clear previous reports when starting a new file analysis
+    setEcgReport({ source: 'Uploaded WFDB File', diagnosis: 'Analyzing...', confidence: '--' });
+    setBloodPrediction(null);
+    setFetchedBloodData(null);
+    setFinalPrediction(null);
 
     const formData = new FormData();
     formData.append('dat', datFile);
@@ -161,34 +158,35 @@ const SensorData = () => {
       const mlResult = await response.json();
       
       if (response.ok) {
-          const confidencePct = (mlResult.confidence * 100).toFixed(1);
-          setFileResult(`✓ File Diagnosis: ${mlResult.diagnosis} (${confidencePct}% match). Auto-saved.`);
+          // Normalize confidence format
+          let conf = parseFloat(mlResult.confidence);
+          if (conf <= 1.0) conf = conf * 100; // Convert 0.85 to 85.0
+          const confidencePct = conf.toFixed(1);
           
-          // Save the ECG result to our secret Ref for averaging later
           ecgResultRef.current = { diagnosis: mlResult.diagnosis, confidence: confidencePct };
+          
+          // Update the ECG report UI
+          setEcgReport({
+            source: 'Uploaded WFDB File',
+            diagnosis: mlResult.diagnosis,
+            confidence: confidencePct
+          });
           
           // --- TRIGGER 2: AUTOMATIC BLOOD ANALYSIS AFTER FILE UPLOAD ---
           setIsPredictingBlood(true);
-          setBloodPrediction("File analysis complete. Analyzing blood biomarkers...");
 
           try {
             const bloodResponse = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/analyze-blood`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                userId: localStorage.getItem('userId') || 'guest',
-                Troponin_I_ng_mL: parseFloat(bloodDataRef.current.Troponin_I_ng_mL) || 0,
-                CK_MB_ng_mL: parseFloat(bloodDataRef.current.CK_MB_ng_mL) || 0,
-                BNP_pg_mL: parseFloat(bloodDataRef.current.BNP_pg_mL) || 0,
-                Potassium_mEq_L: parseFloat(bloodDataRef.current.Potassium_mEq_L) || 0,
-                Creatinine_mg_dL: parseFloat(bloodDataRef.current.Creatinine_mg_dL) || 0
-              })
+              body: JSON.stringify({ userId: localStorage.getItem('userId') || 'guest' })
             });
 
             const bloodResult = await bloodResponse.json();
 
             if (bloodResponse.ok) {
-              setBloodPrediction(`✓ Blood Diagnosis: ${bloodResult.diagnosis} (${bloodResult.confidence}% match). Auto-saved!`);
+              setFetchedBloodData(bloodResult.biomarkers); 
+              setBloodPrediction(`Diagnosis: ${bloodResult.diagnosis} (${bloodResult.confidence}% match)`);
               calculateEnsemblePrediction(bloodResult.diagnosis, bloodResult.confidence);
             } else {
               setBloodPrediction(`❌ Error: ${bloodResult.error}`);
@@ -200,11 +198,11 @@ const SensorData = () => {
           }
 
       } else {
-          setFileResult(`Analysis failed: ${mlResult.error}`);
+          setEcgReport({ source: 'Uploaded WFDB File', diagnosis: `Analysis Failed: ${mlResult.error}`, confidence: '0' });
       }
     } catch (postError) {
       console.error("Backend Error:", postError);
-      setFileResult("Server connection error. Is Flask running?");
+      setEcgReport({ source: 'Uploaded WFDB File', diagnosis: 'Server Connection Error', confidence: '0' });
     }
   };
 
@@ -216,10 +214,8 @@ const SensorData = () => {
       const ecgConf = parseFloat(ecgResultRef.current.confidence) || 0;
       const bConf = parseFloat(bloodConf) || 0;
       
-      // Take the average of the two AI Models
       const avgConfidence = ((ecgConf + bConf) / 2).toFixed(1);
       
-      // Determine final diagnosis (If EITHER model detects risk, we mark as High Risk)
       const d1 = ecgResultRef.current.diagnosis.toLowerCase();
       const d2 = bloodDiag.toLowerCase();
       const hasRisk = d1.includes('infarction') || d1.includes('abnormal') || d2.includes('high risk');
@@ -228,14 +224,6 @@ const SensorData = () => {
       
       setFinalPrediction(`Overall Patient Status: ${finalDiagnosisString} (${avgConfidence}% certainty)`);
     }
-  };
-
-  const handleBloodInputChange = (e) => {
-    setBloodData(prev => {
-      const newData = { ...prev, [e.target.name]: e.target.value };
-      bloodDataRef.current = newData; 
-      return newData;
-    });
   };
 
   const handleSaveAndExit = async () => {
@@ -282,9 +270,9 @@ const SensorData = () => {
           </div>
 
           <div style={{ marginTop: '15px', minHeight: '30px' }}>
-            {livePrediction ? (
-              <p style={{ color: '#14a098', fontWeight: '600', textAlign: 'center', margin: 0, fontSize: '18px' }}>
-                {livePrediction}
+            {ecgReport && ecgReport.source.includes('Live') ? (
+              <p style={{ color: '#14a098', fontWeight: '600', textAlign: 'center', margin: 0, fontSize: '16px' }}>
+                ✓ Stream Complete. Generating final report...
               </p>
             ) : (
               <p style={{ color: '#9ca3af', textAlign: 'center', margin: 0 }}>
@@ -301,6 +289,10 @@ const SensorData = () => {
             <h2 className="upload-title">Upload Past ECG</h2>
           </div>
           
+          <p style={{ textAlign: 'center', color: '#94a3b8', fontSize: '14px', marginTop: '5px', marginBottom: '15px' }}>
+            Select both .dat and .hea files simultaneously.
+          </p>
+
           <input 
             type="file" 
             ref={fileInputRef} 
@@ -314,91 +306,76 @@ const SensorData = () => {
             {selectedFile ? 'Change Files' : 'Upload WFDB Files'}
           </button>
           
-          {selectedFile && <p style={{ marginTop: '16px', color: '#14a098', fontWeight: '600', textAlign: 'center' }}>✓ {selectedFile}</p>}
-          {fileResult && <p style={{ marginTop: '8px', color: fileResult.includes('failed') ? '#ef4444' : '#14a098', fontWeight: 'bold', textAlign: 'center' }}>{fileResult}</p>}
+          {selectedFile && <p style={{ marginTop: '16px', color: '#14a098', fontWeight: '600', textAlign: 'center' }}>✓ {selectedFile} Uploaded</p>}
         </div>
 
         {/* ======================================= */}
-        {/* SECTION 3: BLOOD BIOMARKERS             */}
+        {/* SECTION 3: UNIFIED AI ANALYSIS OUTPUT   */}
         {/* ======================================= */}
-        <div className="upload-card">
-          <div className="upload-header">
-            <span className="upload-icon">🩸</span> 
-            <h2 className="upload-title">Blood Biomarkers</h2>
-          </div>
-          
-          <p style={{ textAlign: 'center', color: '#94a3b8', fontSize: '14px', marginTop: '5px', marginBottom: '15px' }}>
-            Fill in available biomarkers. Analysis will trigger <strong>automatically</strong> when a Live ECG or File Upload completes.
-          </p>
-          
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginTop: '10px' }}>
-            <div>
-              <label style={{ display: 'block', marginBottom: '8px', color: '#cbd5e1', fontSize: '15px', fontWeight: '600', letterSpacing: '0.5px' }}>Troponin I (ng/mL)</label>
-              <input type="number" name="Troponin_I_ng_mL" value={bloodData.Troponin_I_ng_mL} onChange={handleBloodInputChange} 
-                style={{ width: '100%', boxSizing: 'border-box', padding: '12px 15px', fontSize: '16px', borderRadius: '8px', border: '2px solid #64748b', background: '#1e293b', color: '#bae6fd', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.3)' }} />
-            </div>
-            
-            <div>
-              <label style={{ display: 'block', marginBottom: '8px', color: '#cbd5e1', fontSize: '15px', fontWeight: '600', letterSpacing: '0.5px' }}>CK-MB (ng/mL)</label>
-              <input type="number" name="CK_MB_ng_mL" value={bloodData.CK_MB_ng_mL} onChange={handleBloodInputChange} 
-                style={{ width: '100%', boxSizing: 'border-box', padding: '12px 15px', fontSize: '16px', borderRadius: '8px', border: '2px solid #64748b', background: '#1e293b', color: '#bae6fd', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.3)' }} />
+        {ecgReport && (
+          <div className="upload-card" style={{ marginBottom: '24px', borderTop: '4px solid #38bdf8' }}>
+            <div className="upload-header" style={{ borderBottom: '1px solid #334155', paddingBottom: '10px', marginBottom: '15px' }}>
+              <span className="upload-icon">🧠</span> 
+              <h2 className="upload-title">Comprehensive AI Analysis</h2>
             </div>
 
-            <div>
-              <label style={{ display: 'block', marginBottom: '8px', color: '#cbd5e1', fontSize: '15px', fontWeight: '600', letterSpacing: '0.5px' }}>BNP (pg/mL)</label>
-              <input type="number" name="BNP_pg_mL" value={bloodData.BNP_pg_mL} onChange={handleBloodInputChange} 
-                style={{ width: '100%', boxSizing: 'border-box', padding: '12px 15px', fontSize: '16px', borderRadius: '8px', border: '2px solid #64748b', background: '#1e293b', color: '#bae6fd', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.3)' }} />
-            </div>
-
-            <div>
-              <label style={{ display: 'block', marginBottom: '8px', color: '#cbd5e1', fontSize: '15px', fontWeight: '600', letterSpacing: '0.5px' }}>Potassium (mEq/L)</label>
-              <input type="number" name="Potassium_mEq_L" value={bloodData.Potassium_mEq_L} onChange={handleBloodInputChange} 
-                style={{ width: '100%', boxSizing: 'border-box', padding: '12px 15px', fontSize: '16px', borderRadius: '8px', border: '2px solid #64748b', background: '#1e293b', color: '#bae6fd', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.3)' }} />
-            </div>
-
-            <div>
-              <label style={{ display: 'block', marginBottom: '8px', color: '#cbd5e1', fontSize: '15px', fontWeight: '600', letterSpacing: '0.5px' }}>Creatinine (mg/dL)</label>
-              <input type="number" name="Creatinine_mg_dL" value={bloodData.Creatinine_mg_dL} onChange={handleBloodInputChange} 
-                style={{ width: '100%', boxSizing: 'border-box', padding: '12px 15px', fontSize: '16px', borderRadius: '8px', border: '2px solid #64748b', background: '#1e293b', color: '#bae6fd', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.3)' }} />
-            </div>
-          </div>
-
-          {bloodPrediction && (
-            <div style={{ marginTop: '20px', padding: '16px', background: '#0f172a', borderRadius: '8px', border: '2px solid #38bdf8', boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}>
-              <p style={{ color: bloodPrediction.includes('❌') ? '#f87171' : '#34d399', fontSize: '16px', fontWeight: 'bold', textAlign: 'center', margin: 0, letterSpacing: '0.5px' }}>
-                {bloodPrediction}
+            {/* --- STEP 1: ECG RESULT --- */}
+            <div style={{ marginBottom: '20px' }}>
+              <h3 style={{ color: '#bae6fd', fontSize: '15px', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                1. ECG Analysis ({ecgReport.source})
+              </h3>
+              <p style={{ margin: 0, color: '#e2e8f0', fontSize: '16px', background: '#1e293b', padding: '10px', borderRadius: '6px' }}>
+                <strong>Diagnosis:</strong> {ecgReport.diagnosis} <span style={{ color: '#34d399', float: 'right' }}>{ecgReport.confidence}% match</span>
               </p>
             </div>
-          )}
-          
-          {isPredictingBlood && !bloodPrediction && (
-            <p style={{ textAlign: 'center', color: '#0ea5e9', fontWeight: 'bold', marginTop: '15px' }}>
-              Analyzing Blood Biomarkers...
-            </p>
-          )}
-        </div>
+            
+            {/* --- STEP 2: BLOOD FETCHING LOADER --- */}
+            {isPredictingBlood && !bloodPrediction && (
+              <p style={{ textAlign: 'center', color: '#0ea5e9', fontWeight: 'bold', margin: '20px 0' }}>
+                Fetching Blood Biomarkers from Database & Analyzing...
+              </p>
+            )}
 
-        {/* ======================================= */}
-        {/* SECTION 4: THE FINAL ENSEMBLE SCORE     */}
-        {/* ======================================= */}
-        {finalPrediction && (
-          <div className="upload-card" style={{ marginTop: '24px', border: '2px solid #f59e0b', background: '#1e293b' }}>
-            <h2 className="upload-title" style={{ textAlign: 'center', color: '#fbbf24', fontSize: '20px' }}>
-              🤖 Final Combined Assessment
-            </h2>
-            <p style={{ 
-              textAlign: 'center', 
-              fontSize: '18px', 
-              fontWeight: 'bold', 
-              color: finalPrediction.includes('Normal') ? '#34d399' : '#f87171', 
-              marginTop: '15px',
-              marginBottom: '5px'
-            }}>
-              {finalPrediction}
-            </p>
-            <p style={{ textAlign: 'center', color: '#94a3b8', fontSize: '13px', fontStyle: 'italic' }}>
-              *Based on an ensemble average of ECG Data and Blood Biomarker inputs.
-            </p>
+            {/* --- STEP 3: BLOOD NUMBERS & RESULT --- */}
+            {fetchedBloodData && (
+              <div style={{ marginBottom: '20px' }}>
+                <h3 style={{ color: '#bae6fd', fontSize: '15px', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                  2. Blood Biomarker Analysis
+                </h3>
+                <div style={{ background: '#1e293b', padding: '12px', borderRadius: '6px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px', fontSize: '13px', color: '#e2e8f0', borderBottom: '1px solid #334155', paddingBottom: '10px', marginBottom: '10px' }}>
+                    <span><span style={{color: '#64748b'}}>Trop I:</span> <strong>{fetchedBloodData.troponin}</strong></span>
+                    <span><span style={{color: '#64748b'}}>CK-MB:</span> <strong>{fetchedBloodData.ck_mb}</strong></span>
+                    <span><span style={{color: '#64748b'}}>BNP:</span> <strong>{fetchedBloodData.bnp}</strong></span>
+                    <span><span style={{color: '#64748b'}}>K+:</span> <strong>{fetchedBloodData.potassium}</strong></span>
+                    <span><span style={{color: '#64748b'}}>Cr:</span> <strong>{fetchedBloodData.creatinine}</strong></span>
+                  </div>
+                  {bloodPrediction && (
+                    <p style={{ color: bloodPrediction.includes('❌') ? '#f87171' : '#e2e8f0', fontSize: '16px', margin: 0 }}>
+                      <strong>{bloodPrediction.split('(')[0]}</strong> <span style={{ color: '#34d399', float: 'right' }}>({bloodPrediction.split('(')[1]}</span>
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* --- STEP 4: FINAL ENSEMBLE RESULT --- */}
+            {finalPrediction && (
+              <div style={{ marginTop: '20px', padding: '16px', border: '2px solid #f59e0b', background: '#0f172a', borderRadius: '8px', position: 'relative', overflow: 'hidden' }}>
+                <div style={{ position: 'absolute', top: 0, left: 0, width: '4px', height: '100%', background: finalPrediction.includes('Normal') ? '#34d399' : '#f87171' }}></div>
+                <h3 style={{ color: '#fbbf24', fontSize: '16px', margin: '0 0 10px 0', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                  3. Final Ensemble Assessment
+                </h3>
+                <p style={{ 
+                  fontSize: '20px', 
+                  fontWeight: 'bold', 
+                  color: finalPrediction.includes('Normal') ? '#34d399' : '#f87171', 
+                  margin: '0'
+                }}>
+                  {finalPrediction}
+                </p>
+              </div>
+            )}
           </div>
         )}
         

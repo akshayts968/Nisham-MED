@@ -5,7 +5,7 @@ import './MedicalHistory.css';
 const MedicalHistory = () => {
   const navigate = useNavigate();
 
-  // 1. Updated state to hold the new AI metadata fields
+  // 1. Updated state to hold the new AI metadata fields + Blood Biomarkers
   const [formData, setFormData] = useState({
     age: '',
     sex: '',
@@ -16,7 +16,13 @@ const MedicalHistory = () => {
     pace: '',
     extra: '',
     familyHistory: '',
-    pastHeartProblem: ''
+    pastHeartProblem: '',
+    // NEW: Blood Biomarkers
+    troponin: '',
+    ck_mb: '',
+    bnp: '',
+    potassium: '',
+    creatinine: ''
   });
 
   // 2. Fetch existing data when the page loads
@@ -46,7 +52,13 @@ const MedicalHistory = () => {
               pace: data.pace === 1 ? 'yes' : (data.pace === 0 ? 'no' : ''),
               extra: data.extra === 1 ? 'yes' : (data.extra === 0 ? 'no' : ''),
               familyHistory: data.family_heart_history === 1 ? 'yes' : (data.family_heart_history === 0 ? 'no' : ''),
-              pastHeartProblem: data.past_heart_problem || ''
+              pastHeartProblem: data.past_heart_problem || '',
+              // NEW: Pre-fill Blood Biomarkers
+              troponin: data.troponin || '',
+              ck_mb: data.ck_mb || '',
+              bnp: data.bnp || '',
+              potassium: data.potassium || '',
+              creatinine: data.creatinine || ''
             });
           }
         }
@@ -62,7 +74,7 @@ const MedicalHistory = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     
-    // Prevent age, height, and weight from getting too long
+    // Prevent age, height, and weight from getting too long (Doesn't affect decimal blood values)
     if ((name === 'age' || name === 'height' || name === 'weight') && value.length > 3) {
       return; 
     }
@@ -99,7 +111,13 @@ const MedicalHistory = () => {
           pace: formData.pace,
           extra: formData.extra,
           familyHistory: formData.familyHistory,
-          pastHeartProblem: formData.pastHeartProblem
+          pastHeartProblem: formData.pastHeartProblem,
+          // NEW: Send Blood Biomarkers to backend
+          troponin: formData.troponin,
+          ck_mb: formData.ck_mb,
+          bnp: formData.bnp,
+          potassium: formData.potassium,
+          creatinine: formData.creatinine
         }),
       });
 
@@ -156,6 +174,36 @@ const MedicalHistory = () => {
           <div className="form-row label-inline">
             <span className="form-label">WEIGHT (kg) :</span>
             <input type="number" name="weight" className="underlined-input" placeholder="e.g. 70" min="0" value={formData.weight} onChange={handleChange} />
+          </div>
+        </div>
+
+        {/* --- NEW: BLOOD BIOMARKERS CARD --- */}
+        <div className="form-card">
+          <h2 className="section-title">Blood Biomarkers (Latest Report)</h2>
+          
+          <div className="form-row label-inline">
+            <span className="form-label">Troponin I (ng/mL) :</span>
+            <input type="number" step="any" name="troponin" className="underlined-input" placeholder="e.g. 0.04" min="0" value={formData.troponin} onChange={handleChange} />
+          </div>
+
+          <div className="form-row label-inline">
+            <span className="form-label">CK-MB (ng/mL) :</span>
+            <input type="number" step="any" name="ck_mb" className="underlined-input" placeholder="e.g. 5.2" min="0" value={formData.ck_mb} onChange={handleChange} />
+          </div>
+
+          <div className="form-row label-inline">
+            <span className="form-label">BNP (pg/mL) :</span>
+            <input type="number" step="any" name="bnp" className="underlined-input" placeholder="e.g. 150" min="0" value={formData.bnp} onChange={handleChange} />
+          </div>
+
+          <div className="form-row label-inline">
+            <span className="form-label">Potassium (mEq/L) :</span>
+            <input type="number" step="any" name="potassium" className="underlined-input" placeholder="e.g. 4.1" min="0" value={formData.potassium} onChange={handleChange} />
+          </div>
+
+          <div className="form-row label-inline">
+            <span className="form-label">Creatinine (mg/dL) :</span>
+            <input type="number" step="any" name="creatinine" className="underlined-input" placeholder="e.g. 1.2" min="0" value={formData.creatinine} onChange={handleChange} />
           </div>
         </div>
 
