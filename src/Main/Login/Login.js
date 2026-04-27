@@ -45,6 +45,7 @@ const Login = () => {
         // SUCCESS: Save the JWT token to local storage to unlock Protected Routes
         localStorage.setItem('token', data.token);
         localStorage.setItem('userId', data.user.id);
+        localStorage.setItem('role', data.user.role);
         // Navigate to the dashboard
         navigate('/dashboard');
       } else {

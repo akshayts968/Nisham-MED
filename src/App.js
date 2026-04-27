@@ -13,18 +13,33 @@ import ProtectedRoute from './ProtectedRoute';
 import CardLogin from './Main/Login/Card';
 import LiveEcgMonitor from './Main/Dashboard/Diagnosis/Cardiology/SensorData/LiveEcgMonitor';
 import Profile from './Main/Dashboard/Profile/Profile';
+import Neurology from './Main/Dashboard/Diagnosis/Neurology/Neurology';
+import Respiratory from './Main/Dashboard/Diagnosis/Respiratory/Respiratory';
+import Spirometry from './Main/Dashboard/Diagnosis/Respiratory/Spirometry/Spirometry';
+import Cognitive from './Main/Dashboard/Diagnosis/Neurology/Cognitive/Cognitive';
+import PlaceholderPage from './Main/Dashboard/Placeholder/PlaceholderPage';
+import BookAppointment from './Main/Dashboard/Features/components/BookAppointment';
+import AppointmentList from './Main/Dashboard/Features/components/AppointmentList';
+import CallAppointment from './Main/Dashboard/Features/components/CallAppointment';
+import FindDoctor from './Main/Dashboard/Features/components/FindDoctor';
+import LabReports from './Main/Dashboard/Features/components/LabReports';
+import UploadDocuments from './Main/Dashboard/Features/components/UploadDocuments';
+import DocumentGallery from './Main/Dashboard/Features/components/DocumentGallery';
+import ContactUs from './Main/Dashboard/Features/components/ContactUs';
+import AboutUs from './Main/Dashboard/Features/components/AboutUs';
+
 export default function App() {
   return (
     <Router>
       <div className="app-container">
         <Routes>
-          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           
           <Route 
             path="/dashboard" 
-            element={<ProtectedRoute><Dashboard /></ProtectedRoute>} 
+            element={<Dashboard />} 
           />
           <Route 
             path="/dashboard/profile" 
@@ -54,6 +69,32 @@ export default function App() {
             path="/dashboard/diagnosis/cardiology/lifestyle-data" 
             element={<ProtectedRoute><Symptom /></ProtectedRoute>} 
           />
+          <Route 
+            path="/dashboard/diagnosis/neurology" 
+            element={<ProtectedRoute><Neurology /></ProtectedRoute>} 
+          />
+          <Route 
+            path="/dashboard/diagnosis/respiratory" 
+            element={<ProtectedRoute><Respiratory /></ProtectedRoute>} 
+          />
+          <Route 
+            path="/dashboard/diagnosis/respiratory/spirometry" 
+            element={<ProtectedRoute><Spirometry /></ProtectedRoute>} 
+          />
+          <Route 
+            path="/dashboard/diagnosis/neurology/cognitive" 
+            element={<ProtectedRoute><Cognitive /></ProtectedRoute>} 
+          />
+          <Route path="/dashboard/book-appointment" element={<BookAppointment />} />
+          <Route path="/dashboard/appointment-list" element={<AppointmentList />} />
+          <Route path="/dashboard/find-doctor" element={<FindDoctor />} />
+          <Route path="/dashboard/call-appointment" element={<CallAppointment />} />
+          <Route path="/dashboard/upload-documents" element={<ProtectedRoute><UploadDocuments /></ProtectedRoute>} />
+          <Route path="/dashboard/documents" element={<ProtectedRoute><DocumentGallery /></ProtectedRoute>} />
+          <Route path="/dashboard/lab-reports" element={<ProtectedRoute><LabReports /></ProtectedRoute>} />
+          <Route path="/dashboard/contact-us" element={<ContactUs />} />
+          <Route path="/dashboard/about-us" element={<AboutUs />} />
+
           <Route path="/card-login" element={<CardLogin />} />
           <Route path="/card" element={<LiveEcgMonitor />} />
         </Routes>

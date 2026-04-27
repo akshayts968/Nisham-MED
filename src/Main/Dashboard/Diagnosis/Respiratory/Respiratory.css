@@ -1,0 +1,54 @@
+.respiratory-wrapper {
+  background-color: #0b0c10;
+  min-height: 100vh;
+  color: #fff;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+.respiratory-content {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 500px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.respiratory-menu-card {
+  background: rgba(30, 42, 56, 0.6);
+  border: 1px solid rgba(135, 206, 250, 0.1);
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+}
+
+.respiratory-menu-card:hover {
+  background: rgba(60, 80, 107, 0.8);
+  transform: translateY(-2px);
+  border-color: rgba(135, 206, 250, 0.4);
+}
+
+.respiratory-menu-card .card-icon-wrapper {
+  background: #1e3a5f;
+  padding: 12px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #87CEFA;
+}
+
+.respiratory-menu-title {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #E2E8F0;
+  margin: 0;
+}

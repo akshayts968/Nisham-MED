@@ -42,7 +42,7 @@ const Diagnosis = () => {
         {/* Neurology Card (Centered text) */}
         <div 
           className="diagnosis-card centered"
-          onClick={() => navigate('/neurology')} // 3. Added the '/'
+          onClick={() => navigate('/dashboard/diagnosis/neurology')} // 3. Added the '/'
         >
           <h2 className="card-title">Neurology</h2>
         </div>
@@ -50,7 +50,7 @@ const Diagnosis = () => {
         {/* Respiratory Card */}
         <div 
           className="diagnosis-card"
-          onClick={() => navigate('/respiratory')} // 3. Added the '/'
+          onClick={() => navigate('/dashboard/diagnosis/respiratory')} // 3. Added the '/'
         >
           <div className="card-icon-wrapper">
             {/* Professional Lungs SVG */}

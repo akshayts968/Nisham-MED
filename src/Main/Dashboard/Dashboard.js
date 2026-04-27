@@ -6,29 +6,36 @@ import './Dashboard.css';
 const Dashboard = () => {
   const navigate = useNavigate();
 
-  // --- LOGOUT LOGIC ---
-  const handleLogout = () => {
-    // Clear the session tokens
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    
-    // Redirect to login page
-    navigate('/login');
+  const isGuest = !localStorage.getItem('token');
+
+  // --- LOGOUT / LOGIN LOGIC ---
+  const handleAuthAction = () => {
+    if (isGuest) {
+      navigate('/login');
+    } else {
+      // Clear the session tokens
+      localStorage.removeItem('token');
+      localStorage.removeItem('userId');
+      localStorage.removeItem('role');
+      navigate('/login');
+    }
   };
 
   const menuItems = [
-    { title: 'Profile', icon: '👤', route: '/dashboard/profile' }, // <-- ADDED PROFILE ROUTE
-    { title: 'Diagnosis', icon: '🖥️', route: '/dashboard/diagnosis' }, 
-    { title: 'Book An\nAppointment', icon: '📅', route: 'dashboard' },
-    { title: 'Appointment\nList', icon: '📋', route: 'dashboard' },
-    { title: 'Find A\nDoctor', icon: '👨‍⚕️', route: 'dashboard' },
-    { title: 'Call For\nAppointment', icon: '📞', route: 'dashboard' },
-    { title: 'Upload\nDocuments', icon: '📂', route: 'dashboard' },
-    { title: 'Documents', icon: '📄', route: 'dashboard' },
-    { title: 'View Lab\nReports', icon: '📊', route: 'dashboard' },
-    { title: 'Contact Us', icon: '✉️', route: 'dashboard' },
-    { title: 'About Us', icon: 'ℹ️', route: 'dashboard' },
+    { title: 'Profile', icon: '👤', route: '/dashboard/profile', private: true },
+    { title: 'Diagnosis', icon: '🖥️', route: '/dashboard/diagnosis', private: true }, 
+    { title: 'Book An\nAppointment', icon: '📅', route: '/dashboard/book-appointment' },
+    { title: 'Appointment\nList', icon: '📋', route: '/dashboard/appointment-list' },
+    { title: 'Find A\nDoctor', icon: '👨‍⚕️', route: '/dashboard/find-doctor' },
+    { title: 'Call For\nAppointment', icon: '📞', route: '/dashboard/call-appointment' },
+    { title: 'Upload\nDocuments', icon: '📂', route: '/dashboard/upload-documents', private: true },
+    { title: 'Documents', icon: '📄', route: '/dashboard/documents', private: true },
+    { title: 'View Lab\nReports', icon: '📊', route: '/dashboard/lab-reports', private: true },
+    { title: 'Contact Us', icon: '✉️', route: '/dashboard/contact-us' },
+    { title: 'About Us', icon: 'ℹ️', route: '/dashboard/about-us' },
   ];
+
+  const visibleMenuItems = isGuest ? menuItems.filter(item => !item.private) : menuItems;
 
   return (
     <div className="dashboard-container">
@@ -47,9 +54,9 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Right Side: Logout Button */}
-        <button className="logout-btn" onClick={handleLogout}>
-          Logout
+        {/* Right Side: Auth Button */}
+        <button className="logout-btn" onClick={handleAuthAction}>
+          {isGuest ? 'Login' : 'Logout'}
         </button>
 
       </header>
@@ -61,7 +68,7 @@ const Dashboard = () => {
 
       {/* Main Grid */}
       <section className="menu-grid">
-        {menuItems.map((item, index) => (
+        {visibleMenuItems.map((item, index) => (
           <div 
             key={index} 
             className="menu-card"
