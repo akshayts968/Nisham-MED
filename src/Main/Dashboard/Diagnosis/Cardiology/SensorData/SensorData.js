@@ -10,7 +10,6 @@ const SensorData = () => {
   
   // File Upload State
   const [selectedFile, setSelectedFile] = useState(null);
-  const [fileObject, setFileObject] = useState(null);
 
   // Live Wireless Sensor State
   const [isConnected, setIsConnected] = useState(false);
@@ -36,7 +35,7 @@ const SensorData = () => {
   // --- REAL-TIME WEBSOCKET LISTENER ---
   // ==========================================
   useEffect(() => {
-    socketRef.current = io(process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000');
+    socketRef.current = io(process.env.REACT_APP_FLASK_URL || 'http://localhost:5001');
 
     socketRef.current.on('connect', () => setIsConnected(true));
     socketRef.current.on('disconnect', () => setIsConnected(false));
@@ -93,7 +92,7 @@ const SensorData = () => {
         setFinalPrediction(null);
 
         try {
-          const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/analyze-blood`, {
+          const response = await fetch(`${process.env.REACT_APP_FLASK_URL}/api/analyze-blood`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ userId: localStorage.getItem('userId') || 'guest' })
@@ -136,7 +135,7 @@ const SensorData = () => {
 
     const baseName = datFile.name.replace('.dat', '');
     setSelectedFile(`${baseName} (.dat & .hea)`);
-    setFileObject(true); 
+
     
     // Clear previous reports when starting a new file analysis
     setEcgReport({ source: 'Uploaded WFDB File', diagnosis: 'Analyzing...', confidence: '--' });
@@ -150,7 +149,7 @@ const SensorData = () => {
     formData.append('userId', localStorage.getItem('userId') || 'guest');
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/analyze-wfdb`, {
+      const response = await fetch(`${process.env.REACT_APP_FLASK_URL}/api/analyze-wfdb`, {
         method: 'POST',
         body: formData, 
       });
@@ -176,7 +175,7 @@ const SensorData = () => {
           setIsPredictingBlood(true);
 
           try {
-            const bloodResponse = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/analyze-blood`, {
+            const bloodResponse = await fetch(`${process.env.REACT_APP_FLASK_URL}/api/analyze-blood`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ userId: localStorage.getItem('userId') || 'guest' })
