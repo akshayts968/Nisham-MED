@@ -5,21 +5,21 @@ const LiveEcgMonitor = () => {
   const [prediction, setPrediction] = useState("Waiting for 10 seconds of data...");
   const [confidence, setConfidence] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
-  
+
   const canvasRef = useRef(null);
   const xPosRef = useRef(0);
   const socketRef = useRef(null);
 
   useEffect(() => {
     // 1. Connect to your Flask SocketIO Server
-    socketRef.current = io(process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000');
+    socketRef.current = io(process.env.REACT_APP_API_BASE_URL || 'https://nisham-med-back-1.onrender.com');
 
     socketRef.current.on('connect', () => setIsConnected(true));
     socketRef.current.on('disconnect', () => setIsConnected(false));
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
-    
+
     // Draw medical grid background
     const drawGrid = () => {
       ctx.fillStyle = '#f0f8ff'; // Very light blue background
@@ -40,7 +40,7 @@ const LiveEcgMonitor = () => {
     socketRef.current.on('react_live_ecg', (data) => {
       // Scale the ESP32 voltage (0-4095) to fit the React Canvas height
       const scaledY = canvas.height - (data.voltage / 4095) * canvas.height;
-      
+
       xPosRef.current += 2; // Move the line to the right
 
       // Wrap around the screen when it hits the edge
